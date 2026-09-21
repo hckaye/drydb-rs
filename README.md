@@ -1,5 +1,7 @@
 # drydb-rs
 
+[![crates.io](https://img.shields.io/crates/v/drydb.svg)](https://crates.io/crates/drydb) [![docs.rs](https://docs.rs/drydb/badge.svg)](https://docs.rs/drydb)
+
 A read-only embedded key/value store for Rust, over the [DryDB](https://github.com/hadashiA/DryDB) 1.4 file format.
 
 A database is built once into an immutable file. At runtime a query loads only the B+Tree pages it touches, so nothing is deserialised up front, no index is rebuilt at startup, and the file does not have to fit in memory. SQL, updates at runtime, transactions, WAL and MVCC are out of scope.
@@ -14,12 +16,12 @@ The target is storage format 1.4 at upstream commit `6b175929491793948e63430c20c
 
 ## Installing
 
-The crates are not on crates.io. Take them from the repository:
-
 ```toml
 [dependencies]
-drydb = { git = "https://github.com/hckaye/drydb-rs" }
+drydb = "0.1"
 ```
+
+The published version is `0.1.0+drydb1.4`. The build metadata after the `+` names the storage format these crates read and write, the way `libgit2-sys 0.16.2+1.7.2` names the libgit2 it binds. Cargo ignores it when resolving, so `"0.1"` matches.
 
 With default features `drydb` has no dependencies. Two features are optional:
 
@@ -28,13 +30,13 @@ With default features `drydb` has no dependencies. Two features are optional:
 | `mmap` | A memory mapped page source. Pages are copied out of the mapping, so no reference into it escapes, but `MmapSource::open` is `unsafe`: the caller guarantees the file does not change while it is open, and pages the OS keeps resident are outside the memory budget. |
 | `zstd` | The `DryDB.ZstdCompression` page filter, so files written with upstream compression can be read and written. |
 
-| Crate | Contents |
-| --- | --- |
-| [`drydb`](crates/drydb) | Format decoding, page I/O, page cache, B+Tree search, cursors, secondary indexes, blobs, the builder, `verify` |
-| [`drydb-rkyv`](crates/drydb-rkyv) | Record-level rkyv value codec |
-| [`drydb-msgpack`](crates/drydb-msgpack) | MessagePack value codec, reading and writing the same bytes as MessagePack-CSharp |
-| [`drydb-async`](crates/drydb-async) | Async adapter over tokio's blocking pool |
-| [`drydb-cli`](crates/drydb-cli) | The `drydb` command |
+| Crate | Published | Contents |
+| --- | --- | --- |
+| [`drydb`](crates/drydb) | [![crates.io](https://img.shields.io/crates/v/drydb.svg)](https://crates.io/crates/drydb) | Format decoding, page I/O, page cache, B+Tree search, cursors, secondary indexes, blobs, the builder, `verify` |
+| [`drydb-rkyv`](crates/drydb-rkyv) | [![crates.io](https://img.shields.io/crates/v/drydb-rkyv.svg)](https://crates.io/crates/drydb-rkyv) | Record-level rkyv value codec |
+| [`drydb-msgpack`](crates/drydb-msgpack) | [![crates.io](https://img.shields.io/crates/v/drydb-msgpack.svg)](https://crates.io/crates/drydb-msgpack) | MessagePack value codec, reading and writing the same bytes as MessagePack-CSharp |
+| [`drydb-async`](crates/drydb-async) | [![crates.io](https://img.shields.io/crates/v/drydb-async.svg)](https://crates.io/crates/drydb-async) | Async adapter over tokio's blocking pool |
+| [`drydb-cli`](crates/drydb-cli) | [![crates.io](https://img.shields.io/crates/v/drydb-cli.svg)](https://crates.io/crates/drydb-cli) | The `drydb` command |
 
 ## Building a file
 

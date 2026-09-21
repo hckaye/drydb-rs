@@ -1,5 +1,7 @@
 # drydb-rs
 
+[![crates.io](https://img.shields.io/crates/v/drydb.svg)](https://crates.io/crates/drydb) [![docs.rs](https://docs.rs/drydb/badge.svg)](https://docs.rs/drydb)
+
 [DryDB](https://github.com/hadashiA/DryDB) 1.4 のファイル形式を読み書きする、Rust製の読み取り専用組み込みKVストア。
 
 データベースは一度だけビルドして不変のファイルにする。実行時は問い合わせが触れるB+Treeのページだけを読むので、起動時に全件をデシリアライズすることも、索引を作り直すことも、ファイル全体をメモリに載せることもない。SQL、実行時の更新、トランザクション、WAL、MVCCは対象外。
@@ -14,12 +16,12 @@ DryDBは [hadashiA](https://github.com/hadashiA) 氏がC#で書いた読み取�
 
 ## 導入
 
-crates.ioには公開していない。リポジトリから取得する。
-
 ```toml
 [dependencies]
-drydb = { git = "https://github.com/hckaye/drydb-rs" }
+drydb = "0.1"
 ```
+
+公開しているバージョンは `0.1.0+drydb1.4`。`+` のあとのビルドメタデータは、このcrateが読み書きする格納形式を示す（`libgit2-sys 0.16.2+1.7.2` が、bindしているlibgit2の版を示すのと同じ書き方）。解決時には無視されるので、`"0.1"` で一致する。
 
 既定featureでは `drydb` に依存crateは無い。optionalなfeatureが2つある。
 
@@ -28,13 +30,13 @@ drydb = { git = "https://github.com/hckaye/drydb-rs" }
 | `mmap` | メモリマップのページソース。ページはmappingからバッファへコピーするので、mapping内部への参照は外に出ない。ただし `MmapSource::open` は `unsafe` で、開いているあいだファイルが変更されないことの保証は呼び出し側の責任になり、OSがresidentにしたページはメモリ予算の対象外になる。 |
 | `zstd` | `DryDB.ZstdCompression` のページフィルタ。upstreamの圧縮を使ったファイルを読み書きできる。 |
 
-| crate | 内容 |
-| --- | --- |
-| [`drydb`](crates/drydb) | 形式の復号、page I/O、ページキャッシュ、B+Tree検索、cursor、副索引、blob、builder、`verify` |
-| [`drydb-rkyv`](crates/drydb-rkyv) | レコード単位のrkyv値codec |
-| [`drydb-msgpack`](crates/drydb-msgpack) | MessagePack値のcodec。MessagePack-CSharpと同じbytesを読み書きする |
-| [`drydb-async`](crates/drydb-async) | tokioのblocking poolを使うasync adapter |
-| [`drydb-cli`](crates/drydb-cli) | `drydb` コマンド |
+| crate | 公開状況 | 内容 |
+| --- | --- | --- |
+| [`drydb`](crates/drydb) | [![crates.io](https://img.shields.io/crates/v/drydb.svg)](https://crates.io/crates/drydb) | 形式の復号、page I/O、ページキャッシュ、B+Tree検索、cursor、副索引、blob、builder、`verify` |
+| [`drydb-rkyv`](crates/drydb-rkyv) | [![crates.io](https://img.shields.io/crates/v/drydb-rkyv.svg)](https://crates.io/crates/drydb-rkyv) | レコード単位のrkyv値codec |
+| [`drydb-msgpack`](crates/drydb-msgpack) | [![crates.io](https://img.shields.io/crates/v/drydb-msgpack.svg)](https://crates.io/crates/drydb-msgpack) | MessagePack値のcodec。MessagePack-CSharpと同じbytesを読み書きする |
+| [`drydb-async`](crates/drydb-async) | [![crates.io](https://img.shields.io/crates/v/drydb-async.svg)](https://crates.io/crates/drydb-async) | tokioのblocking poolを使うasync adapter |
+| [`drydb-cli`](crates/drydb-cli) | [![crates.io](https://img.shields.io/crates/v/drydb-cli.svg)](https://crates.io/crates/drydb-cli) | `drydb` コマンド |
 
 ## ファイルを作る
 
