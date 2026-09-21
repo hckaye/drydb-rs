@@ -10,7 +10,10 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+# The build metadata names the storage format this reads and writes, as
+# `libgit2-sys 0.16.2+1.7.2` names the libgit2 it binds. Cargo ignores it when
+# resolving, so `drydb = "0.1"` matches.
+version = "0.1.0+drydb1.4"
 edition = "2021"
 rust-version = "1.85"
 license = "MIT"

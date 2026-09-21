@@ -224,7 +224,7 @@ dependencies = [
 
 [[package]]
 name = "drydb"
-version = "0.1.0"
+version = "0.1.0+drydb1.4"
 dependencies = [
  "memmap2",
  "proptest",
@@ -233,7 +233,7 @@ dependencies = [
 
 [[package]]
 name = "drydb-async"
-version = "0.1.0"
+version = "0.1.0+drydb1.4"
 dependencies = [
  "drydb",
  "tokio",
@@ -241,7 +241,7 @@ dependencies = [
 
 [[package]]
 name = "drydb-cli"
-version = "0.1.0"
+version = "0.1.0+drydb1.4"
 dependencies = [
  "clap",
  "drydb",
@@ -249,7 +249,7 @@ dependencies = [
 
 [[package]]
 name = "drydb-interop"
-version = "0.1.0"
+version = "0.1.0+drydb1.4"
 dependencies = [
  "base64",
  "drydb",
@@ -262,7 +262,7 @@ dependencies = [
 
 [[package]]
 name = "drydb-msgpack"
-version = "0.1.0"
+version = "0.1.0+drydb1.4"
 dependencies = [
  "drydb",
  "rmp-serde",
@@ -272,7 +272,7 @@ dependencies = [
 
 [[package]]
 name = "drydb-rkyv"
-version = "0.1.0"
+version = "0.1.0+drydb1.4"
 dependencies = [
  "drydb",
  "rkyv",
