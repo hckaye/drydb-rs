@@ -1040,15 +1040,12 @@ mod tests {
                 .unwrap();
         }
 
-        // The directory goes read-only, so the next file cannot be made.
-        let mut perms = std::fs::metadata(&dir).unwrap().permissions();
-        perms.set_readonly(true);
-        std::fs::set_permissions(&dir, perms).unwrap();
+        // The next file would go into a directory that is not there, so it cannot be
+        // made. A read-only directory would do it on Unix and not on Windows, where the
+        // attribute does not stop a file being created inside.
+        spool.set_dir(dir.join("gone"));
         let refused = spool.rewrite();
-        let mut perms = std::fs::metadata(&dir).unwrap().permissions();
-        #[allow(clippy::permissions_set_readonly_false)]
-        perms.set_readonly(false);
-        std::fs::set_permissions(&dir, perms).unwrap();
+        spool.set_dir(dir.clone());
 
         assert!(refused.is_err(), "a file that cannot be made is an error");
         // And the spool still has everything it had: the records come back in order.
@@ -1101,26 +1098,24 @@ mod tests {
 
         let mut spool = RecordSpool::new(Arc::new(Int64Encoding), dir.clone(), "late", 1);
         let value = vec![0x5Au8; 64 * 1024 + 1];
-        for i in 0..15i64 {
+        // Enough rows for two levels of merging, which is what leaves more dead space
+        // in the file than live data and sets off the compaction. Merging appends to
+        // the file it is already holding; compacting is the step that has to make a new
+        // one, and it comes after the row has been written.
+        let rows = (MERGE_FAN_IN * MERGE_FAN_IN) as i64;
+        for i in 0..rows {
             spool.push(&Int64Encoding::encode(i), &value).unwrap();
         }
 
-        // The directory goes read-only, so the merge the next row sets off cannot open
-        // its file. The row itself is written before that happens.
-        let mut perms = std::fs::metadata(&dir).unwrap().permissions();
-        perms.set_readonly(true);
-        std::fs::set_permissions(&dir, perms).unwrap();
-        let refused = spool.push(&Int64Encoding::encode(15), &value);
-        let mut perms = std::fs::metadata(&dir).unwrap().permissions();
-        #[allow(clippy::permissions_set_readonly_false)]
-        perms.set_readonly(false);
-        std::fs::set_permissions(&dir, perms).unwrap();
+        // That file would go into a directory that is not there.
+        spool.set_dir(dir.join("gone"));
+        let refused = spool.push(&Int64Encoding::encode(rows), &value);
+        spool.set_dir(dir.clone());
 
-        if refused.is_ok() {
-            // The merge happened to fit; nothing to check.
-            std::fs::remove_dir_all(&dir).ok();
-            return;
-        }
+        assert!(
+            refused.is_err(),
+            "the compaction the row set off could not make its file"
+        );
         assert!(
             spool.into_sorted().is_err(),
             "a build cannot go on from here"
