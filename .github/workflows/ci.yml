@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build every feature combination
+        run: |
+          cargo build -p drydb
+          cargo build -p drydb --features mmap
+          cargo build -p drydb --features zstd
+          cargo build -p drydb --all-features
+      - name: Test
+        run: cargo test --workspace --exclude drydb-interop --all-features
+      - name: Documentation examples
+        run: cargo test --workspace --exclude drydb-interop --doc --all-features
+
+  lint:
+    name: format and clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets --all-features
+
+  msrv:
+    name: minimum supported Rust version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85.0
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace --exclude drydb-interop --all-features
+
+  docs:
+    name: documentation
+    runs-on: ubuntu-latest
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo doc --workspace --exclude drydb-interop --all-features --no-deps
+
+  interop:
+    name: interop with the pinned C# implementation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: Swatinem/rust-cache@v2
+      - name: Fetch the pinned upstream commit
+        run: ./tests/interop/fetch-upstream.sh
+      - name: Compare both implementations
+        run: DRYDB_INTEROP=1 cargo test -p drydb-interop --release
+      - name: Publish the fixture manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: interop-manifest
+          path: tests/interop/work/manifest.txt
+          if-no-files-found: ignore
+
+  miri:
+    name: miri
+    runs-on: ubuntu-latest
+    env:
+      MIRIFLAGS: -Zmiri-disable-isolation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: miri
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo miri test -p drydb --lib
+      - run: cargo miri test -p drydb --test miri_smoke
+      # The rkyv adapter runs under the newer aliasing model. Its validation goes
+      # through bytecheck, whose slice check Stacked Borrows reports as undefined
+      # behaviour; there is no unsafe code in this workspace on that path.
+      - run: cargo miri test -p drydb-rkyv
+        env:
+          MIRIFLAGS: -Zmiri-disable-isolation -Zmiri-tree-borrows
+
+  fuzz:
+    name: fuzz (short run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo install cargo-fuzz --locked
+      - name: Run each target briefly
+        working-directory: fuzz
+        run: |
+          for target in open-database parse-page build-then-read rkyv-value; do
+            cargo fuzz run "$target" -- -max_total_time=60
+          done

@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/drydb",
+    "crates/drydb-rkyv",
+    "crates/drydb-cli",
+    "crates/drydb-async",
+    "crates/drydb-msgpack",
+    "crates/drydb-interop",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+repository = "https://github.com/hckaye/drydb-rs"
+authors = ["drydb-rs contributors"]
+
+[workspace.dependencies]
+drydb = { path = "crates/drydb", version = "0.1.0" }
+drydb-rkyv = { path = "crates/drydb-rkyv", version = "0.1.0" }
+
+[profile.bench]
+debug = true

@@ -1,0 +1,17 @@
+[package]
+name = "drydb-rkyv"
+description = "Record-level rkyv value codec for drydb"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "README.md"
+keywords = ["drydb", "rkyv", "zero-copy", "serialization"]
+categories = ["encoding"]
+
+[dependencies]
+drydb = { workspace = true }
+rkyv = { version = "0.8.18", default-features = false, features = ["std", "bytecheck"] }
+

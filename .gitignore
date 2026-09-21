@@ -1,0 +1,12 @@
+/target
+**/*.rs.bk
+/tests/interop/**/bin
+/tests/interop/**/obj
+/tests/interop/fixtures/generated
+/tests/interop/upstream
+/tests/interop/work
+/fuzz/target
+/fuzz/corpus
+/fuzz/artifacts
+/tmp/
+/.worktrees/

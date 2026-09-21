@@ -1,0 +1,54 @@
+[package]
+name = "drydb-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+arbitrary = { version = "1", features = ["derive"] }
+drydb = { path = "../crates/drydb" }
+drydb-rkyv = { path = "../crates/drydb-rkyv" }
+rkyv = { version = "0.8.18", default-features = false, features = ["std", "bytecheck"] }
+
+[[bin]]
+name = "decode"
+path = "src/bin/decode.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "open-database"
+path = "fuzz_targets/open_database.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "parse-page"
+path = "fuzz_targets/parse_page.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "build-then-read"
+path = "fuzz_targets/build_then_read.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "rkyv-value"
+path = "fuzz_targets/rkyv_value.rs"
+test = false
+doc = false
+bench = false
+
+# Keeps the fuzz crate out of the main workspace, which is how cargo-fuzz expects it.
+[workspace]
+members = ["."]

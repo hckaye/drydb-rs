@@ -1,0 +1,20 @@
+[package]
+name = "drydb-msgpack"
+description = "MessagePack value codec for drydb, interoperable with MessagePack-CSharp"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "README.md"
+keywords = ["drydb", "messagepack", "serialization"]
+categories = ["encoding"]
+
+[dependencies]
+drydb = { workspace = true }
+rmp-serde = "1"
+serde = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1"

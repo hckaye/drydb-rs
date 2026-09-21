@@ -1,0 +1,20 @@
+[package]
+name = "drydb-cli"
+description = "Command line tools for DryDB 1.4 database files"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "README.md"
+keywords = ["drydb", "database", "cli"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+drydb = { workspace = true, features = ["zstd"] }
+clap = { version = "4", features = ["derive"] }
+
+[[bin]]
+name = "drydb"
+path = "src/main.rs"

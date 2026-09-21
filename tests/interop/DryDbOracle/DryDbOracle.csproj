@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>13</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>DryDbOracle</AssemblyName>
+    <RootNamespace>DryDbOracle</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../upstream/src/DryDB/DryDB.csproj" />
+    <ProjectReference Include="../upstream/src/DryDB.UlidKey/DryDB.UlidKey.csproj" />
+    <ProjectReference Include="../upstream/src/DryDB.Compression/DryDB.Compression.csproj" />
+    <ProjectReference Include="../upstream/src/DryDB.MessagePack/DryDB.MessagePack.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,35 @@
+[package]
+name = "drydb"
+description = "Read-only embedded B+Tree key/value store compatible with the DryDB 1.4 storage format"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+readme = "README.md"
+keywords = ["database", "btree", "embedded", "read-only", "key-value"]
+categories = ["database-implementations"]
+
+[features]
+default = []
+# Read-only memory mapped page source. Carries a different safety contract than the
+# default positional-IO source; see `docs/architecture.md`.
+mmap = ["dep:memmap2"]
+# Built-in `DryDB.ZstdCompression` page filter.
+zstd = ["dep:zstd-safe"]
+
+[dependencies]
+memmap2 = { version = "0.9", optional = true }
+zstd-safe = { version = "7", features = ["std"], optional = true }
+
+[dev-dependencies]
+proptest = "1"
+
+[[bench]]
+name = "queries"
+harness = false
+
+[[bench]]
+name = "build"
+harness = false
